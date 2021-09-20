@@ -62,6 +62,9 @@ def wait_for_terminated(instance_ids):
         time.sleep(2)
 
 
+##### ##### ##### #####
+# for testing
+
 def test():
     terminate_instances(['i-0681deb87361053dc','i-0d61305a8adc0593c'])
     return 0
