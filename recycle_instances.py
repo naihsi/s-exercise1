@@ -1,5 +1,6 @@
 import logging
 import sys
+import nboto3
 
 
 def fetch_branches(datetime_now):
@@ -7,16 +8,11 @@ def fetch_branches(datetime_now):
 
 
 def fetch_instances():
-    _inst_list = []
-    for row in _inst_list:
-        yield row
+    return nboto3.fetch_instances()
 
 
 def terminate_instances(instance_ids):
-    logging.debug("to terminate:")
-    logging.debug(instance_ids)
-    for row in instance_ids:
-        logging.info("terminated:", row)
+    nboto3.terminate_instances(instance_ids)
 
 
 def main():
@@ -25,25 +21,31 @@ def main():
 
     # fetch the branches
     _branches = fetch_branches(_datetime_now)
-    logging.debug(_branches)
+    logger.debug(_branches)
 
     # check if each instance hits the threshold to recycle
     _to_recycle = []
     for row in fetch_instances():
         # add to recycle list if the commit is too old
-        _to_recycle.add(row)
-    logging.debug(_to_recycle)
+        _to_recycle.append(row["instance_id"])
+    logger.debug("to recycle: {}".format(_to_recycle))
 
     # terminate the candidates ids
+    if len(_to_recycle) == 0:
+        logger.info("no instances to recycle")
+        return 0
+    
     terminate_instances(_to_recycle)
 
 
 if __name__ == "__main__":
     try:
+        logger = logging.getLogger(__name__)
+        logger.addHandler(logging.StreamHandler())
         if "--debug" in sys.argv:
-            logging.basicConfig(level=logging.DEBUG)
+            logger.setLevel(logging.DEBUG)
         else:
-            logging.basicConfig(level=logging.INFO)
+            logger.setLevel(logging.INFO)
         main()
     except Exception as err:
         logging.fatal("undefined exception:", err)
