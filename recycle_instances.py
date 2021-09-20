@@ -1,5 +1,6 @@
 import logging
 import sys
+import os
 from datetime import datetime
 
 import nboto3
@@ -22,13 +23,14 @@ def terminate_instances(instance_ids):
 
 
 def main():
+    print(os.environ["TOKEN"])
     # generate datetime
     _datetime_now = datetime.utcnow()
-    _shift = 100
+    _shift = 10000
     
     # fetch the branches
     _repo_name = "naihsi/s-exercise1"
-    _token = "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"
+    _token = os.environ["TOKEN"]
     _branches = fetch_branches(_repo_name, _token)
     logger.debug(_branches)
 
@@ -39,8 +41,11 @@ def main():
         _sha = _branches[_branch_name]
         
         if commit_older_than_datetime(_sha, _datetime_now, _shift, _repo_name, _token ):
-          # add to recycle list if the commit is too old
-          _to_recycle.append(row["instance_id"])
+            # add to recycle list if the commit is too old
+            _to_recycle.append(row["instance_id"])
+            logger.info("{}({}) queues to terminate".format(row["instance_id"], row["branch_name"]))
+        else:
+            logger.info("{}({}) remains".format(row["instance_id"], row["branch_name"]))
     logger.debug("to recycle: {}".format(_to_recycle))
 
     # terminate the candidates ids

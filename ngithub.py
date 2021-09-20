@@ -1,3 +1,4 @@
+import os
 from github import Github
 from datetime import datetime
 
@@ -36,7 +37,7 @@ def commit_older_than_datetime(sha, datetime_now, shift, repo_name, token):
 def test():
     _datetime_now = datetime.utcnow()
     _repo_name = "naihsi/s-exercise1"
-    _token = "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"
+    _token = os.environ["TOKEN"]
     _branches = fetch_branches(_repo_name, _token)
     print(_branches)
     
