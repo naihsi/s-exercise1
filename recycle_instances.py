@@ -49,6 +49,9 @@ def main():
     _to_recycle = []
     for row in fetch_instances():
         _branch_name = row["branch_name"]
+        if _branch_name not in _branches:
+            logger.warn("{}({}) skipped, branch name not found".format(row["instance_id"], row["branch_name"]))
+            continue
         _sha = _branches[_branch_name]
 
         if commit_older_than_datetime(_sha, _datetime_now, _shift, _repo_name,
