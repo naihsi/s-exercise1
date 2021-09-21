@@ -2,6 +2,7 @@ import logging
 import sys
 import os
 from datetime import datetime
+import argparse
 
 import nboto3
 import ngithub
@@ -73,7 +74,12 @@ if __name__ == "__main__":
     try:
         logger = logging.getLogger(__name__)
         logger.addHandler(logging.StreamHandler())
-        if "--debug" in sys.argv:
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-d", "--debug", help="go debug mode", action="store_true")
+        
+        args = parser.parse_args()
+        if args.debug:
             logger.setLevel(logging.DEBUG)
         else:
             logger.setLevel(logging.INFO)
