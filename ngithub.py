@@ -55,8 +55,9 @@ def branch_exists(branch_name, repo_name, token):
 
 def test():
     _datetime_now = datetime.utcnow()
-    _repo_name = "naihsi/s-exercise1"
+    _repo_name = os.environ["REPO_NAME"]
     _token = os.environ["TOKEN"]
+    _sihft = int(os.environ["TERMINATION_THRESHOLD"])
     
     _branch_name = "dev_2"
     _existance = branch_exists(_branch_name, _repo_name, _token)
@@ -67,7 +68,7 @@ def test():
     print(_branches)
     
     for k,v in _branches.items():
-        if commit_older_than_datetime(v, _datetime_now, 100, _repo_name, _token):
+        if commit_older_than_datetime(v, _datetime_now, _sihft, _repo_name, _token):
             print("{} is too old".format(k))
 
 
