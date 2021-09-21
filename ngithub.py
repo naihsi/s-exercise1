@@ -1,5 +1,6 @@
 import os
 from github import Github
+from github import GithubException
 from datetime import datetime
 
 
@@ -31,6 +32,24 @@ def commit_older_than_datetime(sha, datetime_now, shift, repo_name, token):
         return False
 
 
+def branch_exists(branch_name, repo_name, token):
+    g = Github(token)
+    repo = g.get_repo(repo_name)
+    try:
+        _response = repo.get_branch(branch=branch_name)
+        if _response.name == branch_name:
+            return True
+        
+        # here should not be reached except something goes wrong in PyGithub or github API
+        return False
+    except GithubException as err:
+        if err.status == 404:
+            print("branch {} not found".format(branch_name))
+        else:
+            print("other execption: {}".format(err))
+        return False
+
+
 ##### ##### ##### #####
 # for testing
 
@@ -38,6 +57,12 @@ def test():
     _datetime_now = datetime.utcnow()
     _repo_name = "naihsi/s-exercise1"
     _token = os.environ["TOKEN"]
+    
+    _branch_name = "dev_2"
+    _existance = branch_exists(_branch_name, _repo_name, _token)
+    print("{}: {}".format(_branch_name, _existance))
+    return 0
+    
     _branches = fetch_branches(_repo_name, _token)
     print(_branches)
     
