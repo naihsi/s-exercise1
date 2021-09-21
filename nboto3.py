@@ -9,6 +9,7 @@ def fetch_instances():
     # use tag: recycle_policy = auto to fetch the instances to check and terminate
     _filters = [
       {'Name': 'instance-state-name', 'Values': ['running']},
+      {'Name': 'tag:recycle_policy', 'Values': ['auto']},
       {'Name': 'tag:branch_name', 'Values': ['dev_*']},
     ]
     for row in ec2.instances.filter(Filters=_filters):
@@ -84,6 +85,10 @@ def create_instance(branch_name):
                 {
                     'Key': 'branch_name',
                     'Value': branch_name
+                },
+                {
+                    'Key': 'recycle_policy',
+                    'Value': 'auto'
                 },
             ]
         },
