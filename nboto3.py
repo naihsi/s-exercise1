@@ -12,7 +12,6 @@ def fetch_instances():
       {'Name': 'tag:branch_name', 'Values': ['dev_*']},
     ]
     for row in ec2.instances.filter(Filters=_filters):
-        print(row.state["Name"])
         _branch_name = ""
         for one in row.tags:
             if one['Key'] == 'branch_name':
@@ -32,6 +31,8 @@ def terminate_instances(instance_ids):
         if err.response['Error']['Code'] == 'UnauthorizedOperation':
             print("failed to DryRun terminate instances")
             return None
+        elif err.response['Error']['Code'] == 'DryRunOperation':
+            print("DryRun for terminating instances passed")
 
     # do the termination
     _response = _client.terminate_instances(InstanceIds=instance_ids, DryRun=False)
@@ -88,6 +89,18 @@ def create_instance(branch_name):
         },
     ],
     _client = boto3.client('ec2')
+    try:
+        _response = _client.run_instances(ImageId=_ami_image_id, MinCount=1, MaxCount=1,
+                                          InstanceType=_instance_type,
+                                          TagSpecifications=_tags[0], 
+                                          DryRun=True)
+    except botocore.exceptions.ClientError as err:
+        if err.response['Error']['Code'] == 'UnauthorizedOperation':
+            print("failed to DryRun terminate instances")
+            return None
+        elif err.response['Error']['Code'] == 'DryRunOperation':
+            print("DryRun for creating instances passed")
+    
     _response = _client.run_instances(ImageId=_ami_image_id, MinCount=1, MaxCount=1,
                                       InstanceType=_instance_type,
                                       TagSpecifications=_tags[0])
