@@ -25,14 +25,22 @@ def terminate_instances(instance_ids):
 
 
 def main():
-    print(os.environ["TOKEN"])
+    # check for required env variables
+    _to_check = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_DEFAULT_REGION', 'GITHUB_TOKEN', 'REPO_NAME', 'TERMINATION_THRESHOLD']
+    for row in _to_check:
+        if row not in os.environ:
+            logger.fatal("please set env variable {} to execute this script".format(row))
+            return 1
+    
+    # read setting from env variables
+    _repo_name = os.environ["REPO_NAME"]
+    _token = os.environ["GITHUB_TOKEN"]
+    _shift = int(os.environ["TERMINATION_THRESHOLD"])
+
     # generate datetime
     _datetime_now = datetime.utcnow()
-    _shift = 10000
 
     # fetch the branches
-    _repo_name = "naihsi/s-exercise1"
-    _token = os.environ["TOKEN"]
     _branches = fetch_branches(_repo_name, _token)
     logger.debug(_branches)
 

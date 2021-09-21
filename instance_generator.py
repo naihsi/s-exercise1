@@ -14,14 +14,24 @@ def branch_exists(branch_name, repo_name, token):
 
 
 def launch_instance():
-    _token = os.environ["TOKEN"]
-    _repo_name = "naihsi/s-exercise1"
+    # check for required env variables
+    _to_check = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_DEFAULT_REGION', 'GITHUB_TOKEN', 'REPO_NAME']
+    for row in _to_check:
+        if row not in os.environ:
+            logger.fatal("please set env variable {} to execute this script".format(row))
+            return 1
+    
+    # read setting from env variables
+    _token = os.environ["GITHUB_TOKEN"]
+    _repo_name = os.environ["REPO_NAME"]
     _branch_name = "dev_2"
     
+    # check if the input branch name exists
     if not branch_exists(_branch_name, _repo_name, _token):
         logger.error("branch {} not found, stop the launch of instance".format(_branch_name))
         return 1
     
+    # create the instance
     create_instance(_branch_name)
 
 
