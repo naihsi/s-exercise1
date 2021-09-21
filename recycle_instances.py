@@ -10,8 +10,10 @@ import ngithub
 def fetch_branches(repo_name, token):
     return ngithub.fetch_branches(repo_name, token)
 
+
 def commit_older_than_datetime(sha, datetime_now, shift, repo_name, token):
-    return ngithub.commit_older_than_datetime(sha, datetime_now, shift, repo_name, token)
+    return ngithub.commit_older_than_datetime(sha, datetime_now, shift,
+                                              repo_name, token)
 
 
 def fetch_instances():
@@ -27,7 +29,7 @@ def main():
     # generate datetime
     _datetime_now = datetime.utcnow()
     _shift = 10000
-    
+
     # fetch the branches
     _repo_name = "naihsi/s-exercise1"
     _token = os.environ["TOKEN"]
@@ -39,20 +41,23 @@ def main():
     for row in fetch_instances():
         _branch_name = row["branch_name"]
         _sha = _branches[_branch_name]
-        
-        if commit_older_than_datetime(_sha, _datetime_now, _shift, _repo_name, _token ):
+
+        if commit_older_than_datetime(_sha, _datetime_now, _shift, _repo_name,
+                                      _token):
             # add to recycle list if the commit is too old
             _to_recycle.append(row["instance_id"])
-            logger.info("{}({}) queues to terminate".format(row["instance_id"], row["branch_name"]))
+            logger.info("{}({}) queues to terminate".format(
+              row["instance_id"], row["branch_name"]))
         else:
-            logger.info("{}({}) remains".format(row["instance_id"], row["branch_name"]))
+            logger.info("{}({}) remains".format(row["instance_id"],
+                                                row["branch_name"]))
     logger.debug("to recycle: {}".format(_to_recycle))
 
     # terminate the candidates ids
     if len(_to_recycle) == 0:
         logger.info("no instances to recycle")
         return 0
-    
+
     terminate_instances(_to_recycle)
 
 

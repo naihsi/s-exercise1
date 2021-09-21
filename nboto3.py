@@ -35,11 +35,10 @@ def terminate_instances(instance_ids):
 
     # do the termination
     _response = _client.terminate_instances(InstanceIds=instance_ids, DryRun=False)
-    print(_response)
     if _response["ResponseMetadata"]["HTTPStatusCode"] != 200:
         print("response is not 200: {}".format (_response["ResponseMetadata"]["HTTPStatusCode"]))
         return None
-    
+
     # wait for all instances are terminated correctly
     wait_for_terminated(instance_ids)
 
@@ -50,7 +49,7 @@ def wait_for_terminated(instance_ids):
       {'Name': 'instance-state-name', 'Values': ['terminated']},
       {'Name': 'tag:branch_name', 'Values': ['dev_*']},
     ]
-    
+
     # checking until all instances are terminated
     _ids = instance_ids.copy()
     while len(_ids) != 0:
@@ -66,7 +65,7 @@ def wait_for_terminated(instance_ids):
 # for testing
 
 def test():
-    terminate_instances(['i-0681deb87361053dc','i-0d61305a8adc0593c'])
+    terminate_instances(['i-0681deb87361053dc', 'i-0d61305a8adc0593c'])
     return 0
     for row in fetch_instances():
         print(row["instance_id"])
